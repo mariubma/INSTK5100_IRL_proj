@@ -1,0 +1,7 @@
+[flake8]
+max-line-length = 120
+exclude = .git,__pycache__, old
+extend-ignore = 
+    E203, # whitespace before ':'
+    E741, # ambiguous variable names
+    W503, # line break before binary operator (PEP8 says it should be after)
