@@ -210,7 +210,9 @@ class Mdp(gymnasium.Env):
                     reward_ind = 0
                     if np.array_equal(
                         next_state_ind, self._state_to_ind(self._targ_loc)
-                    ) or np.array_equal(
+                    ):
+                        reward_ind = 1
+                    elif self._sec_targ_loc is not None and np.array_equal(
                         next_state_ind, self._state_to_ind(self._sec_targ_loc)
                     ):
                         reward_ind = 1
