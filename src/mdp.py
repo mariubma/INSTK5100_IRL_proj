@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple, Any
 WINDOW_SIZE = 500
 
 
-class Mpd(gymnasium.Env):
+class Mdp(gymnasium.Env):
     """
     The Mdp is an implementation of the GridWorld environment described
     in Ng & Russell's paper "Algorithms for Inverse Reinforcement Learning".
@@ -23,6 +23,8 @@ class Mpd(gymnasium.Env):
             of the agent. If not provided, the agent starts in the lower left corner ()
         * targ_loc (tuple, optional): A tuple (y, x) indicating the target location.
             If not provided, the target is in the upper right corner.
+        * targ_loc (tuple, optional): A tuple (y, x) indicating the second target location.
+            If not provided, this target is set to Null and not included in the gridworld.
         * targ_rwd (float, optional): The reward for reaching the target. Default is 1.
         * step_rwd (float, optional): The reward for each step. Default is 0.
         * noise (float, optional): The probability of the agent moving in a random
@@ -45,6 +47,7 @@ class Mpd(gymnasium.Env):
         size: int = 5,
         init_loc: Optional[Tuple[int, int]] = None,
         targ_loc: Optional[Tuple[int, int]] = None,
+        sec_targ_loc: Optional[Tuple[int, int]] = None,
         targ_rwd: float = 1,
         step_rwd: float = 0,
         noise: float = 0.3,
@@ -55,6 +58,7 @@ class Mpd(gymnasium.Env):
         self._target_reward = targ_rwd
         self._step_reward = step_rwd
         self._noise = noise
+        self._sec_targ_loc = sec_targ_loc
 
         if init_loc is None:
             self._init_loc = (
@@ -202,10 +206,12 @@ class Mpd(gymnasium.Env):
                     desired_state = np.clip(state_pos + direction, 0, self.size - 1)
                     desired_state = self._state_to_ind(desired_state)
 
-                    # If step is to target, then reward is 1, else 0
+                    # If step is to target, then index is 1, 0 otherwise
                     reward_ind = 0
                     if np.array_equal(
                         next_state_ind, self._state_to_ind(self._targ_loc)
+                    ) or np.array_equal(
+                        next_state_ind, self._state_to_ind(self._sec_targ_loc)
                     ):
                         reward_ind = 1
                     if np.array_equal(next_state_ind, desired_state):
@@ -251,7 +257,9 @@ class Mpd(gymnasium.Env):
             new_location = self._agent_location
         else:
             self._agent_location = new_location
-            if np.array_equal(self._agent_location, self._targ_loc):
+            if np.array_equal(self._agent_location, self._targ_loc) or np.array_equal(
+                self._agent_location, self._sec_targ_loc
+            ):
                 reward = self._target_reward
                 terminated = True
 
@@ -297,14 +305,24 @@ class Mpd(gymnasium.Env):
             treasure_img, (int(pix_square_size), int(pix_square_size))
         )
 
-        # Set coordinates for target
-        treasure_pos = (
+        # Set coordinates for 1st target
+        first_starget_pos = (
             (self._targ_loc[1] * pix_square_size),
             (self._targ_loc[0] * pix_square_size),
         )
 
-        # Draw target
-        canvas.blit(treasure_img, treasure_pos)
+        # Draw first target
+        canvas.blit(treasure_img, first_starget_pos)
+
+        if self._sec_targ_loc is not None:
+            # Set coordinates for 2nd target
+            second_starget_pos = (
+                (self._targ_loc[1] * pix_square_size),
+                (self._targ_loc[0] * pix_square_size),
+            )
+
+            # Draw second target
+            canvas.blit(treasure_img, second_starget_pos)
 
         # Load image of Morris
         morris_img = pygame.image.load("morris.png")
