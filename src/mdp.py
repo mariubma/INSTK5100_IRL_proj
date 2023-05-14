@@ -319,8 +319,8 @@ class Mdp(gymnasium.Env):
         if self._sec_targ_loc is not None:
             # Set coordinates for 2nd target
             second_starget_pos = (
-                (self._targ_loc[1] * pix_square_size),
-                (self._targ_loc[0] * pix_square_size),
+                (self._sec_targ_loc[1] * pix_square_size),
+                (self._sec_targ_loc[0] * pix_square_size),
             )
 
             # Draw second target
