@@ -4,11 +4,10 @@ import numpy as np
 import pygame
 from typing import List, Optional, Tuple, Any
 
-# from src.constants import WINDOW_SIZE
 WINDOW_SIZE = 500
 
 
-class Mpd(gymnasium.Env):
+class Mdp(gymnasium.Env):
     """
     The Mdp is an implementation of the GridWorld environment described
     in Ng & Russell's paper "Algorithms for Inverse Reinforcement Learning".
